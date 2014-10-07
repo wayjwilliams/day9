@@ -21,21 +21,26 @@ class Card
 end
 
 class Deck
-
-  cards = []
+  @@cards = []
 
     def self.build_cards
+      cards = []
       [:hearts, :diamonds, :spades, :clubs].each do |suit|
         (2..10).each do |value|
-          cards << Card.new(suit, value)
-    end
+          @@cards << Card.new(suit, value)
+        end
       ["J", "Q", "K", "A"].each do |facecard|
           cards << Card.new(suit, facecard)
+        end
     end
+    cards
+  end
+
+  @@cards.shuffle!
   end
 
   def self.deal
-    @@cards.shuffle
+    @@cards.shift
   end
 end
 
@@ -82,7 +87,7 @@ end
 def player_turn
   puts "Your cards are #{@player_hand}. Hit(h) or stay(s)?"
   hit_or_stay = gets.chomp
-    if "h"
+    if hit_or_stay == "h"
       hit
     else
       stay
@@ -101,6 +106,7 @@ end
     else
       puts "Dealer wins. Play again!"
   end
+end
 end
 
 
