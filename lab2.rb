@@ -21,17 +21,17 @@ class Card
 end
 
 class Deck
+
   @@cards = []
 
-    def self.build_cards
-      cards = []
-      [:hearts, :diamonds, :spades, :clubs].each do |suit|
-        (2..10).each do |value|
-          @@cards << Card.new(suit, value)
-        end
+  def self.build_cards
+    [:hearts, :diamonds, :spades, :clubs].each do |suit|
+      (2..10).each do |value|
+        @@cards << Card.new(suit, value)
+      end
       ["J", "Q", "K", "A"].each do |facecard|
-          cards << Card.new(suit, facecard)
-        end
+        @@cards << Card.new(suit, facecard)
+      end
     end
     cards
   end
@@ -68,31 +68,31 @@ class Game
     @value = 0
   end
 
-def hit
-  @player_hand.hit_me
-end
-
-def stay
-  determine_winner
-end
-
-def dealer_turn
-  if @dealer_hand.value < 16
-    @dealer_hand.hit_me
-  else
-    stay
+  def hit
+    @player_hand.hit_me
   end
-end
 
-def player_turn
-  puts "Your cards are #{@player_hand}. Hit(h) or stay(s)?"
-  hit_or_stay = gets.chomp
+  def stay
+    determine_winner
+  end
+
+  def dealer_turn
+    if @dealer_hand.value < 16
+      @dealer_hand.hit_me
+    else
+      stay
+    end
+  end
+
+  def player_turn
+    puts "Your cards are #{@player_hand}. Hit(h) or stay(s)?"
+    hit_or_stay = gets.chomp
     if hit_or_stay == "h"
       hit
     else
       stay
     end
-end
+  end
 
   def determine_winner(player_value, dealer_value)
     if player_value > 21
@@ -105,12 +105,14 @@ end
       puts "You win!"
     else
       puts "Dealer wins. Play again!"
+    end
   end
 end
 end
 
 
-
 Deck.build_cards
 Deck.deal
 game = Game.new
+
+# do the dew
