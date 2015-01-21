@@ -1,5 +1,6 @@
 class Card
   attr_reader :suit, :value
+
   def initialize(suit, value)
     @suit = suit
     @value = value
@@ -21,98 +22,97 @@ class Card
 end
 
 class Deck
-
-  @@cards = []
-
-  def self.build_cards
-    [:hearts, :diamonds, :spades, :clubs].each do |suit|
-      (2..10).each do |value|
-        @@cards << Card.new(suit, value)
-      end
-      ["J", "Q", "K", "A"].each do |facecard|
-        @@cards << Card.new(suit, facecard)
-      end
-    end
-    cards
-  end
-
-  @@cards.shuffle!
-  end
-
-  def self.deal
-    @@cards.shift
-  end
-end
-
-class Hand
-  attr_reader :cards, :value
+  attr_accessor :cards, :deal
 
   def initialize
     @cards = []
-    @total = 0
-    @cards = Deck.deal
-    @total = 0
-    @cards = Deck.deal
+    suits = [:hearts, :diamonds, :spades, :clubs]
+
+    suits.each do |suit|
+      (2..10).each do |value|
+        @cards << Card.new(suit, value)
+      end
+      ["J", "Q", "K", "A"].each do |facecard|
+        @cards << Card.new(suit, facecard)
+      end
+    end
   end
 
-  def hit_me
-    @cards << deck.cards.shift
+  def shuffle
+    @cards.shuffle!
+  end
+
+  def deal
+    @cards.shift
+  end
+end
+
+
+class Hand
+  attr_accessor :cards, :deck
+
+  def initialize
+    @cards = []
+    @deck = Deck.new
+  end
+
+  def total
+    @cards.inject(0) do |sum, card|
+      sum += card.value
+    end
   end
 end
 
 class Game
-  attr_accessor :player_hand, :dealer_hand
-  def initialize
-    @player_hand = Hand.new
-    @dealer_hand = Hand.new
-    @value = 0
+
+  player = Hand.new
+  dealer = Hand.new
+  deck = Deck.new
+  deck.shuffle
+
+  2.times do
+    player.cards << deck.deal
   end
 
-  def hit
-    @player_hand.hit_me
+  2.times do
+    dealer.cards << deck.deal
   end
 
-  def stay
-    determine_winner
+  puts "You have"
+  puts "#{player.cards[0]} and #{player.cards[1]}"
+  puts "for a total of: #{player.total}"
+  puts "---------------"
+  puts "Dealer is showing"
+  puts dealer.cards[0]
+  puts "---------------"
+
+  until dealer.total > 16
+    dealer.cards << deck.deal
   end
 
-  def dealer_turn
-    if @dealer_hand.value < 16
-      @dealer_hand.hit_me
-    else
-      stay
+  puts "Hit? (y/n)"
+  answer = gets.chomp
+  until answer.downcase == "n" || player.total > 21
+    player.cards << deck.deal
+    puts "You have: "
+    puts player.cards
+    puts "Your new total is #{player.total}"
+    if player.total < 21
+      puts "Hit again? (y/n)"
+      answer = gets.chomp
     end
   end
 
-  def player_turn
-    puts "Your cards are #{@player_hand}. Hit(h) or stay(s)?"
-    hit_or_stay = gets.chomp
-    if hit_or_stay == "h"
-      hit
-    else
-      stay
-    end
-  end
-
-  def determine_winner(player_value, dealer_value)
-    if player_value > 21
-      puts "You busted. Play again!"
-    elsif dealer_value > 21
-      puts "You win!"
-    elsif player_value == dealer_value
-      puts "Tie. Play again!"
-    elsif player_value > dealer_value
-      puts "You win!"
-    else
-      puts "Dealer wins. Play again!"
-    end
+  if player.total > 21
+    puts "You busted. So sad! Try again!"
+    answer = gets.chomp
+  elsif player.total > dealer.total || player.total == 21
+    puts "You win! Dealer's hand was: #{dealer.cards}"
+  elsif dealer.total > 21
+    puts "You win! Dealer busts with #{dealer.cards}."
+  elsif dealer.total == player.total
+    puts "It's a draw. Play again!"
+  else
+    puts "You Lose. Dealer beat you with #{dealer.cards}"
   end
 end
-end
-
-
-Deck.build_cards
-Deck.deal
-game = Game.new
-
-# do the dew
